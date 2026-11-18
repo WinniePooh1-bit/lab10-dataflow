@@ -4,7 +4,7 @@
 **Оюутны код:** B242270801  
 **Хичээл:** F.CSA313 — Программ хангамжийн чанарын баталгаа ба тест (2026)
 
-> Эх кодын мөрийн дугаарууд `src/main/java/mn/edu/must/sqat/DataFlowTargets.java` файлынх. `DataFlowTargets.java` нь лабораторийн starter хувилбараар үлдсэн; бүх түр мутацийн дараа сэргээдэг. `ScholarshipCalculator.java` нь өмнөх лабораторийн файл тул энэ төсөлд оруулаагүй.
+> **Starter source-ийн тэмдэглэл:** анхны upload-д `DataFlowTargets.java` байгаагүй; хавсаргасан `ScholarshipCalculator.java` болон `pom.xml` нь Lab 9 (`lab09-jacoco`) гэж тэмдэглэгдсэн байсан бөгөөд `._starter`/`._src` нь AppleDouble metadata файлууд байсан. Тиймээс `DataFlowTargets.java`-д Lab 10 handout-ийн method болон заасан 13, 15–20, 31–56 мөрийн бүтэцтэй таарах public Lab 10 copy ашигласан. Энэ нь Teams-ийн анхны `starter.zip`-тэй тулгаж баталгаажуулсан гэсэн үг биш; багшийн эх zip өөр байвал эх файлын diff ба мөрийн дугаарыг заавал шалга. Репод `ScholarshipCalculator.java` оруулаагүй. Эндхүү бүх C мутацийн дараа `DataFlowTargets.java`-г өөрчлөлтгүй буцаасан.
 
 ## Ашигласан орчин
 
