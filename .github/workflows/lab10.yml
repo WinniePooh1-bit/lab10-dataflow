@@ -73,6 +73,11 @@ jobs:
               mvn -B verify 2>&1 | tee results/mvn-verify-final.txt
               cp target/site/jacoco/jacoco.csv results/jacoco-final.csv
               ;;
+            *"[stage-pmd]"*)
+              bash scripts/run-pmd-m3.sh
+              mvn -B verify 2>&1 | tee results/mvn-verify-final.txt
+              cp target/site/jacoco/jacoco.csv results/jacoco-final.csv
+              ;;
             *"[stage-final]"*)
               mvn -B verify 2>&1 | tee results/mvn-verify-final.txt
               cp target/site/jacoco/jacoco.csv results/jacoco-final.csv

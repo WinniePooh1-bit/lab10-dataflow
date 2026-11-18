@@ -41,6 +41,19 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.28.0</version>
+        <configuration>
+          <rulesets>
+            <ruleset>${project.basedir}/pmd-ruleset.xml</ruleset>
+          </rulesets>
+          <format>txt</format>
+          <targetJdk>17</targetJdk>
+          <includeTests>false</includeTests>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
