@@ -1,0 +1,51 @@
+digraph bonus_cfg {
+  graph [rankdir=TB, splines=ortho, nodesep=0.32, ranksep=0.42, bgcolor="white", pad=0.25, label="bonus(int[] attendance, int threshold) — Control Flow Graph", labelloc=t, fontsize=18, fontname="Arial"];
+  node [shape=box, style="rounded,filled", fillcolor="#F7F9FC", color="#334155", fontname="Arial", fontsize=10, margin="0.12,0.08"];
+  edge [color="#475569", fontname="Arial", fontsize=8, arrowsize=0.7];
+
+  start [label="START", shape=oval, fillcolor="#DCFCE7"];
+  c32a [label="32a: attendance == null?", shape=diamond, fillcolor="#FEF3C7"];
+  c32b [label="32b: threshold < 0?", shape=diamond, fillcolor="#FEF3C7"];
+  err [label="33: throw IllegalArgumentException", fillcolor="#FEE2E2"];
+  init [label="35: present = 0\n36: streak = 0\n37: best = 0"];
+  loop [label="38: attendance has next element?\n(p-use attendance)", shape=diamond, fillcolor="#FEF3C7"];
+  next [label="38: a = next element\n(def a)"];
+  c39 [label="39: a > 0?", shape=diamond, fillcolor="#FEF3C7"];
+  present [label="40: present = present + 1\n41: streak = streak + 1"];
+  c42 [label="42: streak > best?", shape=diamond, fillcolor="#FEF3C7"];
+  best [label="43: best = streak"];
+  reset [label="46: streak = 0\n(kills previous streak def)", fillcolor="#FEE2E2"];
+  score0 [label="49: score = 0"];
+  c50 [label="50: present >= threshold?", shape=diamond, fillcolor="#FEF3C7"];
+  score5 [label="51: score = 5"];
+  c53 [label="53: best >= 5?", shape=diamond, fillcolor="#FEF3C7"];
+  score3 [label="54: score = score + 3"];
+  ret [label="56: return score", fillcolor="#DCFCE7"];
+  finish [label="END", shape=oval, fillcolor="#DCFCE7"];
+
+  start -> c32a;
+  c32a -> err [label="T: B03_nullAttendance"];
+  c32a -> c32b [label="F: B01, B02, B04-B07"];
+  c32b -> err [label="T: B04_negativeThreshold"];
+  c32b -> init [label="F: B01, B02, B05-B07"];
+  init -> loop;
+  loop -> next [label="T: B01, B02, B06, B07"];
+  loop -> score0 [label="F: B05"];
+  next -> c39;
+  c39 -> present [label="T: B01, B02, B07"];
+  c39 -> reset [label="F: B01, B06, B07"];
+  present -> c42;
+  c42 -> best [label="T: B01, B02, B07"];
+  c42 -> loop [label="F: B01, B07"];
+  best -> loop;
+  reset -> loop;
+  score0 -> c50;
+  c50 -> score5 [label="T: B02, B05"];
+  c50 -> c53 [label="F: B01, B06, B07"];
+  score5 -> c53;
+  c53 -> score3 [label="T: B01, B02"];
+  c53 -> ret [label="F: B05, B06, B07"];
+  score3 -> ret;
+  err -> finish [style=dashed, label="exception exit"];
+  ret -> finish;
+}
