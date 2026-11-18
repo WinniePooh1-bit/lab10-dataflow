@@ -54,4 +54,9 @@ class BonusTest {
         assertEquals(0, DataFlowTargets.bonus(new int[]{1, 1, 0, 1}, 4));
     }
 
+    @Test
+    @DisplayName("B08 M2 killer: present count 5 differs from longest streak 4; best43->53(T) only in mutant")
+    void B08_m2Killer_totalPresenceMustNotReplaceLongestStreak_40_41_42_43_53() {
+        assertEquals(0, DataFlowTargets.bonus(new int[]{1, 0, 1, 1, 1, 1}, 6));
+    }
 }
