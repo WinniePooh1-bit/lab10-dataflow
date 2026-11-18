@@ -22,4 +22,36 @@ class BonusTest {
                 new int[]{1, 1, 1, 1, 1}, 5));
     }
 
+    @Test
+    @DisplayName("B03 attendance31->32(T); null short-circuit")
+    void B03_nullAttendance_coversAttendanceDefinitionToNullBranch_31_32T() {
+        assertThrows(IllegalArgumentException.class,
+                () -> DataFlowTargets.bonus(null, 1));
+    }
+
+    @Test
+    @DisplayName("B04 threshold31->32(T); attendance non-null and threshold negative")
+    void B04_negativeThreshold_coversThresholdDefinitionToNegativeBranch_31_32T() {
+        assertThrows(IllegalArgumentException.class,
+                () -> DataFlowTargets.bonus(new int[0], -1));
+    }
+
+    @Test
+    @DisplayName("B05 attendance31->38(F), present35->50(T), best37->53(F), score51->56")
+    void B05_emptyArray_zeroThreshold_coversFalseLoopAndScoreReturn_38_50_53_56() {
+        assertEquals(5, DataFlowTargets.bonus(new int[0], 0));
+    }
+
+    @Test
+    @DisplayName("B06 attendance31->38(T/F), a38->39(F), present35->50(F), best37->53(F), score49->56")
+    void B06_allAbsent_belowThreshold_coversInitialDefsToFalseUses_32_38_39_50_53_56() {
+        assertEquals(0, DataFlowTargets.bonus(new int[]{0, 0, 0}, 1));
+    }
+
+    @Test
+    @DisplayName("B07 best43->53(F); streak41->42(F); longest streak stays below five")
+    void B07_shortStreakAfterBreak_coversBestUpdatedDefinitionToFalseBranch_42_53() {
+        assertEquals(0, DataFlowTargets.bonus(new int[]{1, 1, 0, 1}, 4));
+    }
+
 }
