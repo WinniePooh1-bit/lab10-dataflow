@@ -1,0 +1,104 @@
+name: Lab 10 verification and evidence
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Capture tool versions
+        run: |
+          mkdir -p results
+          java -version 2>&1 | tee results/java-version.txt
+          mvn -version 2>&1 | tee results/mvn-version.txt
+
+      - name: Generate CFG PNG
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y graphviz
+          dot -Tpng cfg-bonus.dot -o cfg-bonus.png
+
+      - name: Run stage-specific checks
+        shell: bash
+        run: |
+          message="$(git log -1 --pretty=%s)"
+          case "$message" in
+            *"[stage-alldefs]"*)
+              mvn -B verify 2>&1 | tee results/mvn-verify-alldefs.txt
+              cp target/site/jacoco/jacoco.csv results/jacoco-alldefs.csv
+              ;;
+            *"[stage-allpairs]"*)
+              mvn -B verify 2>&1 | tee results/mvn-verify-allpairs.txt
+              cp target/site/jacoco/jacoco.csv results/jacoco-allpairs.csv
+              ;;
+            *"[stage-mutations]"*)
+              bash scripts/run-mutations.sh
+              ;;
+            *"[stage-m2-kill]"*)
+              SOURCE=src/main/java/mn/edu/must/sqat/DataFlowTargets.java
+              cp "$SOURCE" /tmp/DataFlowTargets.java
+              python3 - <<'PY'
+          from pathlib import Path
+          p = Path("src/main/java/mn/edu/must/sqat/DataFlowTargets.java")
+          s = p.read_text(encoding="utf-8")
+          old = "                    best = streak;"
+          assert s.count(old) == 1
+          p.write_text(s.replace(old, "                    best = present;", 1), encoding="utf-8")
+          PY
+              set +e
+              mvn -B test 2>&1 | tee results/mvn-test-M2-kill.txt
+              code=${PIPESTATUS[0]}
+              set -e
+              printf '\nMaven exit code: %s\n' "$code" | tee -a results/mvn-test-M2-kill.txt
+              cp /tmp/DataFlowTargets.java "$SOURCE"
+              mvn -B verify 2>&1 | tee results/mvn-verify-final.txt
+              cp target/site/jacoco/jacoco.csv results/jacoco-final.csv
+              ;;
+            *"[stage-final]"*)
+              mvn -B verify 2>&1 | tee results/mvn-verify-final.txt
+              cp target/site/jacoco/jacoco.csv results/jacoco-final.csv
+              ;;
+            *)
+              mvn -B verify 2>&1 | tee results/mvn-verify-ci.txt
+              ;;
+          esac
+
+      - name: Upload build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab10-evidence-${{ github.run_number }}
+          path: |
+            results/
+            cfg-bonus.png
+          if-no-files-found: warn
+
+      - name: Commit generated evidence
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results cfg-bonus.png
+          if ! git diff --cached --quiet; then
+            git commit -m "results: save Maven, JaCoCo and CFG evidence [skip ci]"
+            git push origin HEAD:main
+          fi
